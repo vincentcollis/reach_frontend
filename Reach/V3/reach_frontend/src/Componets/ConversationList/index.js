@@ -1,37 +1,30 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
+import {useSelector} from 'react-redux'
 
-import { connect } from 'react-redux'
-import {fetchMessages, fetchVoters} from '../../Redux/actions'
 
 import ConversationSearch from '../ConversationSearch';
 import ConversationListItem from '../ConversationListItem';
 import Toolbar from '../Toolbar';
 import ToolbarButton from '../ToolbarButton';
-import axios from 'axios';
+
 
 import './ConversationList.css';
 
-const ConversationList = (props) => {
-  const [conversations, setConversations] = useState([]);
-  
-  useEffect(() => {
-    fetchVoters()
-  },[])
+export default function Index(props){
+  // Map value to the state this component needs access to
+  const voters = useSelector(state => state.voters)
+  const conversationSearch = useSelector(state => state.search)
 
- const getConversations = () => {
-    // axios.get('https://randomuser.me/api/?results=20').then(response => {
-    //     let newConversations = response.data.results.map(result => {
-    //       return {
-    //         photo: result.picture.large,
-    //         name: `${result.name.first} ${result.name.last}`,
-    //         text: 'Hello world! This is a long message that needs to be truncated.'
-    //       };
-    //     });
-    //     setConversations([...conversations, ...newConversations])
-    // });
-        // setConversations([...conversations, ...newConversations])
+  // Set conversations that will be rendered in conversationList
+  let conversations;
+  if(conversationSearch){
+    conversations = voters.filter(voter =>{
+      return voter.attributes.name.toUpperCase().includes(conversationSearch.toUpperCase())
+    })
+  } else {
+    conversations = voters
   }
-// console.log(props.voters)
+  
     return (
       <div className="conversation-list">
         <Toolbar
@@ -45,10 +38,11 @@ const ConversationList = (props) => {
         />
         <ConversationSearch />
         {
-          conversations.map(conversation =>
+          conversations.map(voter =>
             <ConversationListItem
-              key={conversation.name}
-              data={conversation}
+              key={voter.id}
+              id={voter.id}
+              data={voter.attributes}
             />
           )
         }
@@ -56,12 +50,5 @@ const ConversationList = (props) => {
     );
 }
 
-const mapStateToProps = (state) => {
-  const voters  = state.voters.data
-  // console.log(voters)
-  return {voters: voters }
-}
 
 
-
-export default connect(mapStateToProps, fetchVoters)(ConversationList)

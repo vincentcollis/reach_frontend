@@ -2,46 +2,60 @@ import reachBackend from '../api/reachBackend'
 
 // Get All Messages from API
 export const fetchMessages = () => {
+  
   return async (dispatch) => {
     const response = await reachBackend.get('/messages')
-    
-    dispatch({type: 'FETCH_MESSAGES', payload: response})
+    dispatch({type: 'FETCH_MESSAGES', payload: response.data.data})
   }
 }
 
 // Get All Voters from API
 export const fetchVoters = () => {
+  // console.log(dispatch)
   return async (dispatch) => {
+    // console.log("working")
     const response = await reachBackend.get('/voters')
-    // console.log(response.data)
+    
     dispatch({type: 'FETCH_VOTERS', payload: response.data})
   }
 }
 
 // Add a message
-export const addMessage = (messages) => {
-  return{
-    type: "ADD_MESSAGES",
-    payload: messages
+export const composeMessage = (message) => {
+  const {voter_id, user_id, body, origin} = message
+  return async (dispatch) => {
+    const resposne =  await reachBackend.post('/send_sms',{
+      voter_id, user_id, body, origin
+    })
+    await console.log(resposne)
   }
+  
 }
 
 // Add a voter
-export const addVoter = (voters) => {
+export const addVoter = (voter) => {
   return{
     type: "ADD_VOTERS",
-    payload: voters
+    payload: voter
   }
 }
 
-// Choose the selected conversation.
-  // This conversation will be the one that is highlighted
-export const selectconversation = (conversation) => {
+// set selected conversation
+export const selectConversation = (conversation) => {
   return{
     type: "CONVERSATION_SELECTED",
     payload: conversation
   }
 }
+
+// set Search Messages filter
+export const searchConversations = (search) => {
+  return{
+    type: "SEARCH_CONVERSATIONS",
+    payload: search
+  }
+}
+
 
 
 
